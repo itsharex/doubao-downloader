@@ -4,9 +4,6 @@
 
 **基于 React 开发的豆包AI无水印资源批量下载浏览器扩展/油猴脚本。**
 
-![KOLd7Hv.gif](https://iili.io/KgJifef.gif)
-
-
 ## 开始使用
 
 > 实现思路可以查看我的另一个仓库：[通过HOOK掉JSON.parse实现豆包AI无水印下载教程](https://github.com/LauZzL/remove-doubao-images)
@@ -25,11 +22,11 @@
 
 - 或[Releases](https://github.com/LauZzL/doubao-downloader/releases)下载 `.crx` 或 `.zip` 文件， `.crx` 文件可直接拖入浏览器中安装，`.zip` 文件需要解压后导入。
 
+## 无水印视频下载
+
+详情见：[Issue #6](https://github.com/LauZzL/doubao-downloader/issues/6)
+
 ## 预览
-
-#### 发现新图片
-
-![KOLd7Hv.gif](https://iili.io/KgJifef.gif)
 
 #### 对话实时获取
 
