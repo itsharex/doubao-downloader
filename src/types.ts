@@ -15,6 +15,11 @@ export type Creation = {
   };
 };
 
+export type Message = {
+  conversation_id: string;
+  message_id: string;
+  creations: Creation[];
+}
 
 declare global {
   const __APP_VERSION__: string;

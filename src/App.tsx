@@ -12,7 +12,11 @@ import { useLiveQuery } from "dexie-react-hooks";
 
 function App() {
   const [isOpen, setIsOpen] = useState(false);
-  const [images, setImages] = useState<string[]>([]);
+  const [messages, setMessages] = useState<{
+    urls: string[];
+    message_id: string;
+    conversation_id: string;
+  }[]>([]);
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState({
     current: 0,
@@ -20,10 +24,9 @@ function App() {
   });
 
   // 获取已下载的图片记录
-  const downloaded = new Set(useLiveQuery(() => db.downloaded.toArray(), [])?.map(
-    (item) => item.url
-  ));
-
+  const downloaded = new Set(
+    useLiveQuery(() => db.downloaded.toArray(), [])?.map((item) => item.url)
+  );
 
   useEffect(() => {
     try {
@@ -95,15 +98,19 @@ function App() {
     }
   };
 
-  useCreation((urls) => {
-    const newImages = urls.filter((url) => !images.includes(url));
-    if (newImages.length > 0) {
-      setImages((prev) => [...prev, ...newImages]);
+  useCreation((urls, conversation_id, message_id) => {
+    console.log("newImages", urls, conversation_id, message_id);
+    const newMessages = messages.find((item) => item.message_id === message_id) ?? { urls, message_id, conversation_id };
+    if (newMessages) {
+      setMessages((prev) => [...prev, newMessages]);
       toast("🎉 有新图片", {
-        description: `获取到${newImages.length}张图片`,
+        description: `获取到${newMessages.urls.length}张图片`,
         action: {
           label: "一键下载",
           onClick: () => {
+            const newImages = newMessages.urls.filter(
+              (url) => !downloaded.has(url)
+            );
             download(newImages);
           },
         },
@@ -115,7 +122,7 @@ function App() {
     <div>
       <Indicator onClick={() => setIsOpen(!isOpen)} />
       <Home
-        urls={images}
+        messages={messages}
         downloadedImages={downloaded}
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}

@@ -1,8 +1,15 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { ImageSelector } from "./components/ImageSelector";
+import CheckBox from "./components/CheckBox";
+import { db } from "./utils/db";
+import { useLiveQuery } from "dexie-react-hooks";
 
 interface HomeProps {
-  urls: string[];
+  messages: {
+    urls: string[];
+    message_id: string;
+    conversation_id: string;
+  }[];
   downloadedImages: Set<string>;
   isOpen: boolean;
   onClose: () => void;
@@ -13,6 +20,12 @@ interface HomeProps {
 
 export const Home = (props: HomeProps) => {
   const [selectedUrls, setSelectedUrls] = useState<string[]>([]);
+  const [urls, setUrls] = useState<string[]>([]);
+  const setting = useLiveQuery(() => db.setting.toArray(), []) || [];
+
+  useEffect(() => {
+    setUrls(props.messages.map((message) => message.urls).flat());
+  }, [props.messages]);
 
   const handleOnSelectChange = useCallback((selected: string[]) => {
     setSelectedUrls(selected);
@@ -27,16 +40,14 @@ export const Home = (props: HomeProps) => {
 
   const downloadAll = async () => {
     if (props.isDownloading) return;
-    await props.onDownload(props.urls);
+    await props.onDownload(urls);
     // 下载完成后清除勾选
     setSelectedUrls([]);
   };
 
   // 勾选所有未下载的图片
   const selectUndownloaded = () => {
-    const undownloaded = props.urls.filter(
-      (url) => !props.downloadedImages.has(url)
-    );
+    const undownloaded = urls.filter((url) => !props.downloadedImages.has(url));
     setSelectedUrls(undownloaded);
   };
 
@@ -46,13 +57,13 @@ export const Home = (props: HomeProps) => {
   };
 
   // 统计未下载的图片数量
-  const undownloadedCount = props.urls.filter(
+  const undownloadedCount = urls.filter(
     (url) => !props.downloadedImages.has(url)
   ).length;
 
   // 重置下载记录
   const handleResetDownloaded = () => {
-    if (window.confirm('确定要清除所有下载记录吗？此操作不可恢复。')) {
+    if (window.confirm("确定要清除所有下载记录吗？此操作不可恢复。")) {
       props.onResetDownloaded();
     }
   };
@@ -72,7 +83,9 @@ export const Home = (props: HomeProps) => {
                 className="dd-btn primary"
                 disabled={props.isDownloading}
               >
-                {props.isDownloading ? "下载中..." : `下载所有 (${props.urls.length})`}
+                {props.isDownloading
+                  ? "下载中..."
+                  : `下载所有 (${urls.length})`}
               </button>
               <button
                 onClick={downloadSelected}
@@ -86,7 +99,8 @@ export const Home = (props: HomeProps) => {
                 className="dd-btn"
                 disabled={undownloadedCount === 0}
                 style={{
-                  backgroundColor: undownloadedCount > 0 ? "#10b981" : "#9ca3af",
+                  backgroundColor:
+                    undownloadedCount > 0 ? "#10b981" : "#9ca3af",
                   color: "white",
                 }}
               >
@@ -97,7 +111,8 @@ export const Home = (props: HomeProps) => {
                 className="dd-btn"
                 disabled={selectedUrls.length === 0}
                 style={{
-                  backgroundColor: selectedUrls.length > 0 ? "#f59e0b" : "#9ca3af",
+                  backgroundColor:
+                    selectedUrls.length > 0 ? "#f59e0b" : "#9ca3af",
                   color: "white",
                 }}
                 title="清除所有勾选"
@@ -109,7 +124,8 @@ export const Home = (props: HomeProps) => {
                 className="dd-btn"
                 disabled={props.downloadedImages.size === 0}
                 style={{
-                  backgroundColor: props.downloadedImages.size > 0 ? "#ef4444" : "#9ca3af",
+                  backgroundColor:
+                    props.downloadedImages.size > 0 ? "#ef4444" : "#9ca3af",
                   color: "white",
                 }}
                 title="清除所有下载记录"
@@ -119,9 +135,22 @@ export const Home = (props: HomeProps) => {
             </div>
           </div>
         </div>
+        <div className="dd-action-btns">  
+          <CheckBox id="1" name="1" label="下载时按展示顺序下载" checked={
+            setting.find((item) => item.key === "download_order")?.value === "true"
+          } onChange={
+            (checked) => {
+              db.setting.put({
+                id: 1,
+                key: "download_order",
+                value: checked ? "true" : "false",
+              });
+            }
+          }></CheckBox>
+        </div>
         <div className="dd-images-container">
           <ImageSelector
-            images={props.urls}
+            images={urls}
             downloadedImages={props.downloadedImages}
             selectedUrls={selectedUrls}
             onSelectChange={handleOnSelectChange}

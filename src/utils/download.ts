@@ -2,12 +2,18 @@ import pLimit from "p-limit";
 import streamSaver from "streamsaver";
 import { saveAs } from "file-saver";
 import createZipWriter from "@/lib/zip-stream";
+import { db } from "./db";
 
 // 配置 StreamSaver mitm URL (用于支持旧浏览器)
 if (typeof window !== "undefined") {
   streamSaver.mitm =
     "https://jimmywarting.github.io/StreamSaver.js/mitm.html?version=2.0.0";
 }
+
+const getSetting = async (key: string): Promise<string | null> => {
+  const setting = await db.setting.where("key").equals(key).first();
+  return setting?.value || null;
+};
 
 const downloadImage = async (url: string): Promise<Blob> => {
   try {
@@ -59,6 +65,7 @@ const createZipStreamWithZipStreamLib = async (
   onProgress: (current: number, total: number) => void,
   onError: (url: string, error: Error) => void
 ): Promise<void> => {
+  const downloadOrder = await getSetting("download_order");
   const total = imageUrls.length;
   let completed = 0;
 
@@ -74,8 +81,13 @@ const createZipStreamWithZipStreamLib = async (
       const downloadPromises = imageUrls.map((url) =>
         limit(async () => {
           try {
+            
             const blob = await downloadImage(url);
-            const fileName = getFileNameFromUrl(url);
+            let fileName = getFileNameFromUrl(url);
+            // downloadOrder为true时添加index-前缀
+            downloadOrder === "true"
+              ? `index-${imageUrls.indexOf(url) + 1}-${fileName}`
+              : fileName;
             return { url, fileName, blob, success: true as const };
           } catch (error) {
             onError(url, error as Error);
