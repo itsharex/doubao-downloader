@@ -3,7 +3,7 @@ interface FileLike {
   lastModified?: number;
   directory?: boolean;
   comment?: string;
-  stream?: () => ReadableStream<Uint8Array>;
+  stream?: () => ReadableStream<Uint8Array> | ReadableStream<Uint8Array<ArrayBuffer>>;
 }
 
 interface ZipObject {
