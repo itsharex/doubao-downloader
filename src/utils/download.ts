@@ -80,34 +80,42 @@ const createZipStreamWithZipStreamLib = async (
       const downloadPromises = imageUrls.map((url) =>
         limit(async () => {
           try {
-            const res = await fetch(url);
-            if (!res.ok) {
-              throw new Error(`下载失败: ${res.status} ${res.statusText}`);
-            }
-            const stream = () => res.body as ReadableStream<Uint8Array<ArrayBuffer>>;
+            const blob = await downloadImage(url);
             let fileName = getFileNameFromUrl(url);
             fileName = downloadOrder
               ? `${imageUrls.indexOf(url) + 1}-${fileName}`
               : fileName;
-
-            // 添加文件
-            zipWriter.enqueue({
-              name: fileName,
-              lastModified: Date.now(),
-              directory: false,
-              stream: stream,
-            });
+            return { url, fileName, blob, success: true as const };
           } catch (error) {
             console.error(`下载图片 ${url} 失败:`, error);
             onError(url, error as Error);
-          } finally {
-            onProgress(completed, total);
-            completed++;
+            return { url, fileName: "", blob: null, success: false as const };
           }
         })
       );
 
-      await Promise.all(downloadPromises);
+      const downloadResults = await Promise.all(downloadPromises);
+
+      for (const result of downloadResults) {
+        if (result.success && result.blob) {
+          const imageStream = result.blob.stream();
+
+          try {
+            zipWriter.enqueue({
+              name: result.fileName,
+              lastModified: Date.now(),
+              directory: false,
+              stream: () => imageStream,
+            });
+          } catch (error) {
+            console.error("添加文件到ZIP失败:", error);
+            onError(result.url, error as Error);
+          }
+
+          completed++;
+          onProgress(completed, total);
+        }
+      }
 
       zipWriter.close();
     },
