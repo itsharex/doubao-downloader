@@ -2,11 +2,11 @@
 
 ## 项目介绍
 
-**基于 React 开发的豆包AI无水印资源批量下载浏览器扩展/油猴脚本。**
+**基于 React 开发的豆包 AI 无水印资源批量下载浏览器扩展/油猴脚本。**
 
 ## 开始使用
 
-> 实现思路可以查看我的另一个仓库：[通过HOOK掉JSON.parse实现豆包AI无水印下载教程](https://github.com/LauZzL/remove-doubao-images)
+> 实现思路可以查看我的另一个仓库：[通过 HOOK 掉 JSON.parse 实现豆包 AI 无水印下载教程](https://github.com/LauZzL/remove-doubao-images)
 
 ### 以油猴脚本形式使用
 
@@ -57,10 +57,10 @@
 
 ```shell
 # 安装依赖
-yarn install
+pnpm install
 
 # 启动开发环境:油猴开发环境
-yarn dev
+pnpm dev
 ```
 
 ### 打包
@@ -69,9 +69,8 @@ yarn dev
 
 ```shell
 # 打包
-yarn build
+pnpm build
 ```
-
 
 ## 免责声明
 
