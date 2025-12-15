@@ -1,0 +1,53 @@
+name: build
+
+on:
+  workflow_dispatch: # 手动触发工作流
+
+jobs:
+  build:
+    name: Build and Package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.12.0
+          cache: "pnpm"
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: latest
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build project
+        run: pnpm build
+
+      - name: Verify build filese
+        run: |
+          ls -la dist/
+          if [ ! -f "dist/doubao-downloader.user.js" ] || [ ! -f "dist/logo.png" ] || [ ! -f "dist/manifest.json" ] || [ ! -f "dist/popup.html" ]; then
+            echo "Error: Build files missing!"
+            exit 1
+          fi
+
+      - name: Package dist files to zip
+        run: |
+          cd dist
+          zip -r ../doubao-downloader.zip ./*
+          cd ..
+          ls -la doubao-downloader.zip
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: doubao-downloader
+          path: |
+            dist/doubao-downloader.user.js
+            doubao-downloader.zip
+          retention-days: 30
