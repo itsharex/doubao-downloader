@@ -6,21 +6,28 @@
 
 ## 开始使用
 
-> 实现思路可以查看我的另一个仓库：[通过 HOOK 掉 JSON.parse 实现豆包 AI 无水印下载教程](https://github.com/LauZzL/remove-doubao-images)
+你可以拉取代码自行构建或到[Releases](https://github.com/LauZzL/doubao-downloader/releases)下载构建好的文件。
+
+> 构建后的文件位于 `dist` 目录下。
 
 ### 以油猴脚本形式使用
 
-[打包](#打包)成功后或到[Releases](https://github.com/LauZzL/doubao-downloader/releases)下载构建好的脚本文件，将 `doubao-downloader.user.js` 添加到油猴扩展中使用。
+> 如果你的浏览器已经安装了油猴插件，那么你可以在 `Releases` 中点击 `doubao-downloader.user.js` 即可自动跳转至安装页面(这可能需要你有良好的网络环境)。
+
+将 `doubao-downloader.user.js` 添加到油猴扩展中使用。
+
 
 ### 以浏览器扩展形式使用
 
-> 在浏览器扩展使用需要打开 `开发者模式` 选项。
+> 你必须要打开浏览器扩展页面的 `开发者模式` 选项才能以扩展方式使用。
 
-- 手动[打包](#打包)后，在浏览器扩展页面中选择 `加载未打包的扩展程序`，选择 `dist` 目录，导入即可。
+- 手动打包：在浏览器扩展页面中选择 `加载未打包的扩展程序`，选择 `dist` 目录，导入即可。
 
 ![KOLlEle.png](https://iili.io/KOLlEle.png)
 
-- 或[Releases](https://github.com/LauZzL/doubao-downloader/releases)下载 `.crx` 或 `.zip` 文件， `.crx` 文件可直接拖入浏览器中安装，`.zip` 文件需要解压后导入。
+- 使用构建好的文件：`.zip` 文件可直接拖入进行添加，或解压后选择 `加载未打包的扩展程序` 导入。
+
+> `.crx` 文件暂时无法拖入安装，安装后可能无法正常使用。
 
 ## 无水印视频下载
 
