@@ -1,8 +1,9 @@
 import pLimit from "p-limit";
 import streamSaver from "streamsaver";
 import { saveAs } from "file-saver";
-import createZipWriter from "@/lib/zip-stream";
+import  "../lib/zip-stream.js";
 import { db } from "./db";
+import type { ZipWriter } from "@/types.js";
 
 // 配置 StreamSaver mitm URL (用于支持旧浏览器)
 if (typeof window !== "undefined") {
@@ -72,8 +73,9 @@ const createZipStreamWithZipStreamLib = async (
   const fileStream = streamSaver.createWriteStream(`${zipName}.zip`);
   const writer = fileStream.getWriter();
 
-  const zipReadableStream = createZipWriter({
-    async start(zipWriter) {
+  const zipReadableStream = window.ZIP({
+
+    async start(zipWriter: ZipWriter) {
       const concurrency = 5;
       const limit = pLimit(concurrency);
 
