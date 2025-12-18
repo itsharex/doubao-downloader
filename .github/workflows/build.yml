@@ -34,6 +34,7 @@ jobs:
             echo "Error: Build files missing!"
             exit 1
           fi
+      
 
       - name: Package dist files to zip
         run: |
@@ -42,11 +43,16 @@ jobs:
           cd ..
           ls -la doubao-downloader.zip
 
-      - name: Upload build artifacts
+      - name: Upload Browser Extension
         uses: actions/upload-artifact@v4
         with:
-          name: doubao-downloader
-          path: |
-            dist/doubao-downloader.user.js
-            doubao-downloader.zip
+          name: doubao-downloader-extension
+          path: doubao-downloader.zip
+          retention-days: 30
+
+      - name: Upload UserScript
+        uses: actions/upload-artifact@v4
+        with:
+          name: doubao-downloader-userscript
+          path: dist/doubao-downloader.user.js
           retention-days: 30
