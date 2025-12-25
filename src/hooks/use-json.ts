@@ -2,14 +2,28 @@ import { findAllKeysInJson } from "../utils/json";
 import type { Creation } from "../types";
 import { useEffect, useRef } from "react";
 
-export function useCreation(callback: (urls: string[]) => void) {
+export function useJson(
+  callback: (e: { urls: string[]; type: "image" | "video" }) => void
+) {
   const prevUrls = useRef<Set<string>>(new Set());
-
   useEffect(() => {
     const _parse = JSON.parse;
     window.origin_parse = JSON.parse;
     JSON.parse = function (data) {
       let jsonData = _parse(data);
+      if (data.match("play_info")) {
+        // 视频
+        const play_infos = findAllKeysInJson(jsonData, "play_info");
+        if (play_infos.length > 0) {
+          const play_info = play_infos[0];
+          const play_url = play_info?.main as string;
+          play_url &&
+            callback({
+              urls: [play_url],
+              type: "video",
+            });
+        }
+      }
       if (!data.match("creations")) return jsonData;
       let creations = findAllKeysInJson(jsonData, "creations") as Creation[][];
       if (creations.length > 0) {
@@ -19,7 +33,8 @@ export function useCreation(callback: (urls: string[]) => void) {
             const rawUrl = item?.image?.image_ori_raw?.url;
             if (rawUrl) {
               item.image.image_ori && (item.image.image_ori.url = rawUrl);
-              item.image.image_preview && (item.image.image_preview.url = rawUrl);
+              item.image.image_preview &&
+                (item.image.image_preview.url = rawUrl);
               item.image.image_thumb && (item.image.image_thumb.url = rawUrl);
               !images.includes(rawUrl) && images.push(rawUrl);
             }
@@ -30,7 +45,10 @@ export function useCreation(callback: (urls: string[]) => void) {
           (url) => !prevUrls.current.has(url)
         );
         if (uniqueNewUrls.length > 0) {
-          callback(uniqueNewUrls);
+          callback({
+            urls: uniqueNewUrls,
+            type: "image",
+          });
           prevUrls.current = new Set([...prevUrls.current, ...uniqueNewUrls]);
         }
       }

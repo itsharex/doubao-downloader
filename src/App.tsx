@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { Indicator } from "./components/Indicator";
 import { Home } from ".//Home";
-import { useCreation } from "./hooks/use-creation";
+import { useJson } from "./hooks/use-json";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import downloadImagesAsZip from "./utils/download";
@@ -96,16 +96,29 @@ function App() {
     }
   };
 
-  useCreation((urls) => {
-    const newImages = urls.filter((url) => !images.includes(url));
-    if (newImages.length > 0) {
-      setImages((prev) => [...prev, ...newImages]);
-      toast("🎉 有新图片", {
-        description: `获取到${newImages.length}张图片`,
+  useJson(({ urls, type }) => {
+    if (type === "image") {
+      const newImages = urls.filter((url) => !images.includes(url));
+      if (newImages.length > 0) {
+        setImages((prev) => [...prev, ...newImages]);
+        toast("🎉 有新图片", {
+          description: `获取到${newImages.length}张图片`,
+          action: {
+            label: "一键下载",
+            onClick: () => {
+              download(newImages);
+            },
+          },
+        });
+      }
+    }
+    if (type === "video") {
+      toast("🎉 获取到视频", {
+        description: `是否在新窗口打开视频？`,
         action: {
-          label: "一键下载",
+          label: "打开视频",
           onClick: () => {
-            download(newImages);
+            window.open(urls[0], "_blank");
           },
         },
       });
