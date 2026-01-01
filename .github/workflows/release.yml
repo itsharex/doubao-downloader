@@ -69,16 +69,12 @@ jobs:
           draft: true
 
           tag_name: ${{ env.PACKAGE_VERSION }}
-          name: "Doubao Downloader - ${{ env.PACKAGE_VERSION }}"
+          name: "${{ env.PACKAGE_VERSION }}"
           body: |
 
-            - 构建触发：${{ github.event_name }}
-            - 构建ID：${{ github.run_id }}
-            - 构建时间：${{ github.run_at }}
-            - 项目版本：${{ env.PACKAGE_VERSION }}
-            - 包含文件：
-              1. doubao-downloader.zip（浏览器扩展完整包）
-              2. doubao-downloader.user.js（用户脚本）
+            ## What's Changed
+            - write changelog
+
 
           files: |
             doubao-downloader.zip
